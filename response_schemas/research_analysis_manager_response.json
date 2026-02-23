@@ -1,0 +1,134 @@
+{
+  "agent_name": "Research Analysis Manager",
+  "agent_id": "699bfb968b71a4ceaa856261",
+  "description": "Coordinates the interview analysis pipeline \u2014 routes raw notes to parsing, theme categorization, and summary generation sub-agents, then aggregates into final structured output",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "analysis_status": "string",
+    "parsed_findings": {
+      "findings": [
+        {
+          "id": "string",
+          "category": "string",
+          "description": "string",
+          "user_quote": "string",
+          "emotional_intensity": "string",
+          "implicit_need": "string"
+        }
+      ],
+      "total_findings": "number",
+      "summary": "string"
+    },
+    "categorized_themes": {
+      "themes": [
+        {
+          "theme_name": "string",
+          "category": "string",
+          "description": "string",
+          "impact_score": "number",
+          "frequency": "number",
+          "priority_score": "number",
+          "supporting_findings": [
+            "string"
+          ],
+          "key_quotes": [
+            "string"
+          ]
+        }
+      ],
+      "total_themes": "number",
+      "cross_cutting_patterns": [
+        "string"
+      ]
+    },
+    "executive_summary": {
+      "executive_narrative": "string",
+      "top_insights": [
+        {
+          "rank": "number",
+          "insight": "string",
+          "supporting_theme": "string",
+          "urgency": "string"
+        }
+      ],
+      "action_items": [
+        {
+          "action": "string",
+          "impact_score": "number",
+          "effort_estimate": "string",
+          "roadmap_alignment": "string",
+          "assigned_to": "string"
+        }
+      ],
+      "roadmap_alignment_summary": "string",
+      "urgent_items": [
+        "string"
+      ]
+    }
+  },
+  "example_response": {
+    "analysis_status": "sample string",
+    "parsed_findings": {
+      "findings": [
+        {
+          "id": "sample string",
+          "category": "sample string",
+          "description": "sample string",
+          "user_quote": "sample string",
+          "emotional_intensity": "sample string",
+          "implicit_need": "sample string"
+        }
+      ],
+      "total_findings": 0,
+      "summary": "sample string"
+    },
+    "categorized_themes": {
+      "themes": [
+        {
+          "theme_name": "sample string",
+          "category": "sample string",
+          "description": "sample string",
+          "impact_score": 0,
+          "frequency": 0,
+          "priority_score": 0,
+          "supporting_findings": [
+            "sample string"
+          ],
+          "key_quotes": [
+            "sample string"
+          ]
+        }
+      ],
+      "total_themes": 0,
+      "cross_cutting_patterns": [
+        "sample string"
+      ]
+    },
+    "executive_summary": {
+      "executive_narrative": "sample string",
+      "top_insights": [
+        {
+          "rank": 0,
+          "insight": "sample string",
+          "supporting_theme": "sample string",
+          "urgency": "sample string"
+        }
+      ],
+      "action_items": [
+        {
+          "action": "sample string",
+          "impact_score": 0,
+          "effort_estimate": "sample string",
+          "roadmap_alignment": "sample string",
+          "assigned_to": "sample string"
+        }
+      ],
+      "roadmap_alignment_summary": "sample string",
+      "urgent_items": [
+        "sample string"
+      ]
+    }
+  }
+}

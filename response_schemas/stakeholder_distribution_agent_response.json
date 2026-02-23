@@ -1,0 +1,34 @@
+{
+  "agent_name": "Stakeholder Distribution Agent",
+  "agent_id": "699bfbc969f2efc6b101759f",
+  "description": "Sends the approved summary to Slack channels, emails it via Gmail to specified stakeholders, creates a structured Notion page, logs action items as GitHub issues, and creates a Google Calendar follow-up event",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "distribution_status": "string",
+    "channels": [
+      {
+        "channel_name": "string",
+        "status": "string",
+        "link": "string",
+        "details": "string"
+      }
+    ],
+    "github_issues_created": "number",
+    "summary_message": "string"
+  },
+  "example_response": {
+    "distribution_status": "sample string",
+    "channels": [
+      {
+        "channel_name": "sample string",
+        "status": "sample string",
+        "link": "sample string",
+        "details": "sample string"
+      }
+    ],
+    "github_issues_created": 0,
+    "summary_message": "sample string"
+  }
+}

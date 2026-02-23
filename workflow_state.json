@@ -1,0 +1,71 @@
+{
+  "app_name": "InsightLens — User Research Intelligence Hub",
+  "agents": {
+    "interview_parser_agent": {
+      "agent_id": "699bfb5fc10386a9cdb3e9c4",
+      "name": "Interview Parser Agent",
+      "type": "sub-agent",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "description": "Extracts discrete findings, user quotes, pain points, feature requests, and behavioral observations from raw interview notes"
+    },
+    "theme_categorizer_agent": {
+      "agent_id": "699bfb7b53bd4dbe464ea112",
+      "name": "Theme Categorizer Agent",
+      "type": "sub-agent",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "description": "Groups parsed findings into themes, tags by category (pain point, feature request, workflow issue), and prioritizes by impact and frequency"
+    },
+    "summary_generator_agent": {
+      "agent_id": "699bfb60fb62c45cbd3beb14",
+      "name": "Summary Generator Agent",
+      "type": "sub-agent",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "description": "Produces executive summary with top 3-5 insights, prioritized action items with impact scores, and cross-references findings against product roadmap context"
+    },
+    "research_analysis_manager": {
+      "agent_id": "699bfb968b71a4ceaa856261",
+      "name": "Research Analysis Manager",
+      "type": "manager",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "managed_agents": [
+        "699bfb5fc10386a9cdb3e9c4",
+        "699bfb7b53bd4dbe464ea112",
+        "699bfb60fb62c45cbd3beb14"
+      ],
+      "description": "Coordinates the interview analysis pipeline — routes raw notes to parsing, theme categorization, and summary generation sub-agents, then aggregates into final structured output"
+    },
+    "stakeholder_distribution_agent": {
+      "agent_id": "699bfbc969f2efc6b101759f",
+      "name": "Stakeholder Distribution Agent",
+      "type": "independent",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "tools": [
+        "SLACK_CHAT_POST_MESSAGE",
+        "SLACK_FIND_CHANNELS",
+        "GMAIL_SEND_EMAIL",
+        "NOTION_CREATE_NOTION_PAGE",
+        "NOTION_ADD_PAGE_CONTENT",
+        "GITHUB_CREATE_AN_ISSUE",
+        "GITHUB_ADD_LABELS_TO_AN_ISSUE",
+        "GOOGLECALENDAR_CREATE_EVENT"
+      ],
+      "description": "Sends the approved summary to Slack channels, emails it via Gmail to specified stakeholders, creates a structured Notion page, logs action items as GitHub issues, and creates a Google Calendar follow-up event"
+    }
+  },
+  "workflow": {
+    "entry_point": "research_analysis_manager",
+    "flow": "input_node -> research_analysis_manager -> [interview_parser_agent, theme_categorizer_agent, summary_generator_agent] -> stakeholder_distribution_agent -> output_node"
+  },
+  "response_schemas": {
+    "interview_parser_agent": "response_schemas/interview_parser_agent_response.json",
+    "theme_categorizer_agent": "response_schemas/theme_categorizer_agent_response.json",
+    "summary_generator_agent": "response_schemas/summary_generator_agent_response.json",
+    "research_analysis_manager": "response_schemas/research_analysis_manager_response.json",
+    "stakeholder_distribution_agent": "response_schemas/stakeholder_distribution_agent_response.json"
+  }
+}
