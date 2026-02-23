@@ -1,9 +1,9 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { callAIAgent } from '@/lib/aiAgent'
 import { cn } from '@/lib/utils'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
+/* Card components available if needed */
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -11,10 +11,10 @@ import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import { ScrollArea } from '@/components/ui/scroll-area'
+/* ScrollArea replaced with native div for iframe compatibility */
 import { Skeleton } from '@/components/ui/skeleton'
 import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+/* Tabs available if needed */
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible'
@@ -244,30 +244,7 @@ const SAMPLE_SESSIONS: Session[] = [
   }
 ]
 
-// ============================================================
-// THEME
-// ============================================================
-const THEME_VARS: React.CSSProperties & Record<string, string> = {
-  '--background': '0 0% 100%',
-  '--foreground': '222 47% 11%',
-  '--card': '0 0% 98%',
-  '--card-foreground': '222 47% 11%',
-  '--primary': '222 47% 11%',
-  '--primary-foreground': '210 40% 98%',
-  '--secondary': '210 40% 96%',
-  '--secondary-foreground': '222 47% 11%',
-  '--muted': '210 40% 94%',
-  '--muted-foreground': '215 16% 47%',
-  '--border': '214 32% 91%',
-  '--destructive': '0 84% 60%',
-  '--ring': '222 47% 11%',
-  '--radius': '0.875rem',
-  '--chart-1': '12 76% 61%',
-  '--chart-2': '173 58% 39%',
-  '--chart-3': '197 37% 24%',
-  '--chart-4': '43 74% 66%',
-  '--chart-5': '27 87% 67%',
-}
+// Theme variables are defined in globals.css
 
 // ============================================================
 // HELPERS
@@ -800,9 +777,22 @@ export default function Page() {
     { id: 'analysis' as const, label: 'New Analysis', icon: <PenTool className="h-4 w-4" /> },
   ]
 
+  // ---- DERIVED RESULTS DATA (computed outside JSX for clarity) ----
+  const resultsAnalysis = currentSession?.analysisResult ?? null
+  const resultsFindings = Array.isArray(resultsAnalysis?.parsed_findings?.findings) ? resultsAnalysis!.parsed_findings.findings : []
+  const resultsThemes = Array.isArray(resultsAnalysis?.categorized_themes?.themes) ? resultsAnalysis!.categorized_themes.themes : []
+  const resultsInsights = Array.isArray(resultsAnalysis?.executive_summary?.top_insights) ? resultsAnalysis!.executive_summary.top_insights : []
+  const resultsActionItems = Array.isArray(resultsAnalysis?.executive_summary?.action_items) ? resultsAnalysis!.executive_summary.action_items : []
+  const resultsUrgentItems = Array.isArray(resultsAnalysis?.executive_summary?.urgent_items) ? resultsAnalysis!.executive_summary.urgent_items : []
+  const resultsCrossPatterns = Array.isArray(resultsAnalysis?.categorized_themes?.cross_cutting_patterns) ? resultsAnalysis!.categorized_themes.cross_cutting_patterns : []
+  const resultsNarrative = resultsAnalysis?.executive_summary?.executive_narrative ?? ''
+  const resultsRoadmapSummary = resultsAnalysis?.executive_summary?.roadmap_alignment_summary ?? ''
+  const resultsFindingsSummary = resultsAnalysis?.parsed_findings?.summary ?? ''
+  const resultsDistResult = currentSession?.distributionResult ?? null
+
   return (
     <ErrorBoundary>
-      <div style={THEME_VARS} className="min-h-screen bg-background text-foreground font-sans">
+      <div className="min-h-screen bg-background text-foreground font-sans">
         {/* Gradient background layer */}
         <div className="fixed inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, hsl(210 20% 97%) 0%, hsl(220 25% 95%) 35%, hsl(200 20% 96%) 70%, hsl(230 15% 97%) 100%)' }} />
 
@@ -872,7 +862,7 @@ export default function Page() {
             </header>
 
             {/* Content */}
-            <ScrollArea className="flex-1">
+            <div className="flex-1 overflow-y-auto">
               <div className="p-6 max-w-6xl mx-auto w-full">
 
                 {/* ============ DASHBOARD SCREEN ============ */}
@@ -1026,20 +1016,7 @@ export default function Page() {
                 )}
 
                 {/* ============ RESULTS SCREEN ============ */}
-                {screen === 'results' && currentSession?.analysisResult && (() => {
-                  const analysis = currentSession.analysisResult
-                  const findings = Array.isArray(analysis?.parsed_findings?.findings) ? analysis.parsed_findings.findings : []
-                  const themes = Array.isArray(analysis?.categorized_themes?.themes) ? analysis.categorized_themes.themes : []
-                  const insights = Array.isArray(analysis?.executive_summary?.top_insights) ? analysis.executive_summary.top_insights : []
-                  const actionItems = Array.isArray(analysis?.executive_summary?.action_items) ? analysis.executive_summary.action_items : []
-                  const urgentItems = Array.isArray(analysis?.executive_summary?.urgent_items) ? analysis.executive_summary.urgent_items : []
-                  const crossPatterns = Array.isArray(analysis?.categorized_themes?.cross_cutting_patterns) ? analysis.categorized_themes.cross_cutting_patterns : []
-                  const narrative = analysis?.executive_summary?.executive_narrative ?? ''
-                  const roadmapSummary = analysis?.executive_summary?.roadmap_alignment_summary ?? ''
-                  const findingsSummary = analysis?.parsed_findings?.summary ?? ''
-                  const distResult = currentSession.distributionResult
-
-                  return (
+                {screen === 'results' && currentSession?.analysisResult && (
                     <div className="space-y-6">
                       {/* Header */}
                       <div className="flex items-start justify-between gap-4">
@@ -1054,8 +1031,8 @@ export default function Page() {
                               <span className={cn("inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold", getStatusBadge(currentSession.status).color)}>
                                 {getStatusBadge(currentSession.status).label}
                               </span>
-                              {analysis?.analysis_status && (
-                                <span className="text-[10px] text-muted-foreground">Status: {analysis.analysis_status}</span>
+                              {resultsAnalysis?.analysis_status && (
+                                <span className="text-[10px] text-muted-foreground">Status: {resultsAnalysis.analysis_status}</span>
                               )}
                             </div>
                           </div>
@@ -1072,13 +1049,13 @@ export default function Page() {
                       {statusMessage && <InlineStatus type={statusMessage.type} message={statusMessage.message} />}
 
                       {/* Urgent Items Banner */}
-                      {urgentItems.length > 0 && (
+                      {resultsUrgentItems.length > 0 && (
                         <GlassCard className="p-4 border-l-4 border-l-red-500 bg-red-50/50">
                           <div className="flex items-start gap-2">
                             <AlertTriangle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
                             <div>
                               <p className="text-xs font-semibold text-red-800 mb-1">Urgent Items</p>
-                              {urgentItems.map((item, idx) => (
+                              {resultsUrgentItems.map((item, idx) => (
                                 <p key={idx} className="text-xs text-red-700 leading-relaxed">{item}</p>
                               ))}
                             </div>
@@ -1092,17 +1069,17 @@ export default function Page() {
                           <Sparkles className="h-5 w-5 text-primary" />
                           <h2 className="text-base font-semibold tracking-tight">Executive Summary</h2>
                         </div>
-                        {narrative && (
+                        {resultsNarrative && (
                           <div className="mb-5 text-sm text-foreground leading-relaxed">
-                            {renderMarkdown(narrative)}
+                            {renderMarkdown(resultsNarrative)}
                           </div>
                         )}
 
                         {/* Top Insights */}
-                        {insights.length > 0 && (
+                        {resultsInsights.length > 0 && (
                           <div className="space-y-3 mt-4">
                             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Top Insights</h3>
-                            {insights.map((insight, idx) => (
+                            {resultsInsights.map((insight, idx) => (
                               <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-white/50 border border-border/50">
                                 <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
                                   {insight?.rank ?? idx + 1}
@@ -1129,13 +1106,13 @@ export default function Page() {
                         )}
 
                         {/* Roadmap Alignment */}
-                        {roadmapSummary && (
+                        {resultsRoadmapSummary && (
                           <div className="mt-5 p-3 rounded-lg bg-blue-50/50 border border-blue-100">
                             <div className="flex items-center gap-1.5 mb-1">
                               <Target className="h-3.5 w-3.5 text-blue-600" />
                               <span className="text-xs font-semibold text-blue-800">Roadmap Alignment</span>
                             </div>
-                            <p className="text-xs text-blue-700 leading-relaxed">{roadmapSummary}</p>
+                            <p className="text-xs text-blue-700 leading-relaxed">{resultsRoadmapSummary}</p>
                           </div>
                         )}
                       </GlassCard>
@@ -1149,14 +1126,14 @@ export default function Page() {
                               <div className="flex items-center gap-2">
                                 <Layers className="h-4 w-4 text-primary" />
                                 <h2 className="text-sm font-semibold tracking-tight">Themes</h2>
-                                <Badge variant="secondary" className="text-[10px]">{analysis?.categorized_themes?.total_themes ?? themes.length}</Badge>
+                                <Badge variant="secondary" className="text-[10px]">{resultsAnalysis?.categorized_themes?.total_themes ?? resultsThemes.length}</Badge>
                               </div>
                             </div>
 
-                            {themes.length > 0 ? (
+                            {resultsThemes.length > 0 ? (
                               <Accordion type="multiple" className="space-y-0">
-                                {themes.map((theme, idx) => {
-                                  const relatedFindings = findings.filter(f => Array.isArray(theme?.supporting_findings) && theme.supporting_findings.includes(f?.id))
+                                {resultsThemes.map((theme, idx) => {
+                                  const relatedFindings = resultsFindings.filter(f => Array.isArray(theme?.supporting_findings) && theme.supporting_findings.includes(f?.id))
                                   return (
                                     <AccordionItem key={idx} value={`theme-${idx}`} className="border-b border-border/50">
                                       <AccordionTrigger className="text-sm font-medium hover:no-underline py-3">
@@ -1236,10 +1213,10 @@ export default function Page() {
                             )}
 
                             {/* Cross-cutting patterns */}
-                            {crossPatterns.length > 0 && (
+                            {resultsCrossPatterns.length > 0 && (
                               <div className="mt-4 p-3 rounded-lg bg-purple-50/50 border border-purple-100">
                                 <p className="text-[10px] font-semibold text-purple-800 uppercase mb-1.5">Cross-Cutting Patterns</p>
-                                {crossPatterns.map((p, pi) => (
+                                {resultsCrossPatterns.map((p, pi) => (
                                   <p key={pi} className="text-xs text-purple-700 leading-relaxed flex items-start gap-1.5">
                                     <TrendingUp className="h-3 w-3 shrink-0 mt-0.5" />{p}
                                   </p>
@@ -1249,14 +1226,14 @@ export default function Page() {
                           </GlassCard>
 
                           {/* Findings Summary */}
-                          {findingsSummary && (
+                          {resultsFindingsSummary && (
                             <GlassCard className="p-4">
                               <div className="flex items-center gap-2 mb-2">
                                 <FileText className="h-4 w-4 text-primary" />
                                 <h3 className="text-xs font-semibold tracking-tight">Findings Summary</h3>
-                                <Badge variant="secondary" className="text-[10px]">{analysis?.parsed_findings?.total_findings ?? findings.length} total</Badge>
+                                <Badge variant="secondary" className="text-[10px]">{resultsAnalysis?.parsed_findings?.total_findings ?? resultsFindings.length} total</Badge>
                               </div>
-                              <p className="text-xs text-muted-foreground leading-relaxed">{findingsSummary}</p>
+                              <p className="text-xs text-muted-foreground leading-relaxed">{resultsFindingsSummary}</p>
                             </GlassCard>
                           )}
                         </div>
@@ -1267,12 +1244,12 @@ export default function Page() {
                             <div className="flex items-center gap-2 mb-4">
                               <Target className="h-4 w-4 text-primary" />
                               <h2 className="text-sm font-semibold tracking-tight">Action Items</h2>
-                              <Badge variant="secondary" className="text-[10px]">{actionItems.length}</Badge>
+                              <Badge variant="secondary" className="text-[10px]">{resultsActionItems.length}</Badge>
                             </div>
 
-                            {actionItems.length > 0 ? (
+                            {resultsActionItems.length > 0 ? (
                               <div className="space-y-3">
-                                {actionItems.map((item, idx) => {
+                                {resultsActionItems.map((item, idx) => {
                                   const alignCfg = getAlignmentConfig(item?.roadmap_alignment ?? '')
                                   const effortCfg = getEffortConfig(item?.effort_estimate ?? '')
                                   return (
@@ -1316,11 +1293,11 @@ export default function Page() {
                             <div className="flex items-center gap-2 mb-4">
                               <Search className="h-4 w-4 text-primary" />
                               <h2 className="text-sm font-semibold tracking-tight">All Findings</h2>
-                              <Badge variant="secondary" className="text-[10px]">{findings.length}</Badge>
+                              <Badge variant="secondary" className="text-[10px]">{resultsFindings.length}</Badge>
                             </div>
-                            {findings.length > 0 ? (
+                            {resultsFindings.length > 0 ? (
                               <Accordion type="multiple" className="space-y-0">
-                                {findings.map((finding, idx) => (
+                                {resultsFindings.map((finding, idx) => (
                                   <AccordionItem key={idx} value={`finding-${idx}`} className="border-b border-border/50">
                                     <AccordionTrigger className="text-xs font-medium hover:no-underline py-2.5">
                                       <div className="flex items-center gap-2 text-left">
@@ -1362,18 +1339,18 @@ export default function Page() {
                           </GlassCard>
 
                           {/* Distribution Results */}
-                          {distResult && (
+                          {resultsDistResult && (
                             <GlassCard className="p-5">
                               <div className="flex items-center gap-2 mb-3">
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                                 <h2 className="text-sm font-semibold tracking-tight">Distribution Results</h2>
                               </div>
-                              {distResult?.distribution_status && (
-                                <p className="text-xs text-muted-foreground mb-3">Status: {distResult.distribution_status}</p>
+                              {resultsDistResult?.distribution_status && (
+                                <p className="text-xs text-muted-foreground mb-3">Status: {resultsDistResult.distribution_status}</p>
                               )}
-                              {Array.isArray(distResult?.channels) && distResult.channels.length > 0 && (
+                              {Array.isArray(resultsDistResult?.channels) && resultsDistResult.channels.length > 0 && (
                                 <div className="space-y-2 mb-3">
-                                  {distResult.channels.map((ch, ci) => (
+                                  {resultsDistResult.channels.map((ch, ci) => (
                                     <div key={ci} className="flex items-center justify-between p-2 rounded bg-white/50 border border-border/30">
                                       <div className="flex items-center gap-2">
                                         {ch?.channel_name?.toLowerCase()?.includes('slack') && <Hash className="h-3.5 w-3.5 text-purple-600" />}
@@ -1401,21 +1378,20 @@ export default function Page() {
                                   ))}
                                 </div>
                               )}
-                              {typeof distResult?.github_issues_created === 'number' && distResult.github_issues_created > 0 && (
+                              {typeof resultsDistResult?.github_issues_created === 'number' && resultsDistResult.github_issues_created > 0 && (
                                 <p className="text-xs text-muted-foreground flex items-center gap-1">
-                                  <Github className="h-3 w-3" />{distResult.github_issues_created} GitHub issue(s) created
+                                  <Github className="h-3 w-3" />{resultsDistResult.github_issues_created} GitHub issue(s) created
                                 </p>
                               )}
-                              {distResult?.summary_message && (
-                                <p className="text-xs text-foreground mt-2 font-medium">{distResult.summary_message}</p>
+                              {resultsDistResult?.summary_message && (
+                                <p className="text-xs text-foreground mt-2 font-medium">{resultsDistResult.summary_message}</p>
                               )}
                             </GlassCard>
                           )}
                         </div>
                       </div>
                     </div>
-                  )
-                })()}
+                )}
 
                 {/* Results screen with no data */}
                 {screen === 'results' && !currentSession?.analysisResult && (
@@ -1430,7 +1406,7 @@ export default function Page() {
                   </div>
                 )}
               </div>
-            </ScrollArea>
+            </div>
           </main>
         </div>
 
